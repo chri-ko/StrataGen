@@ -1,5 +1,6 @@
 /*
     Copyright 2020 Rick Weyrauch,
+    Copyright 2021 Christian Koch
 
     Permission to use, copy, modify, and/or distribute this software for any purpose 
     with or without fee is hereby granted, provided that the above copyright notice
@@ -17,6 +18,7 @@
 import { Card, CardType } from "./card";
 import { serialize, deserialize } from "typescript-json-serializer";
 import { parse } from 'papaparse';
+import { jsPDF } from "jspdf";
 
 let activeCards: Card[] = [];
 let currentCard = 0;
@@ -123,22 +125,35 @@ function handleCreate() {
 
         let dpi = 300;
         let marginMm = 0;
-        const outputDPIInput = document.getElementById('outputdpi') as HTMLInputElement;
-        if (outputDPIInput) dpi = parseInt(outputDPIInput.value);
-        const outputMargin = document.getElementById('outputmargin') as HTMLInputElement;
-        if (outputMargin) marginMm = parseInt(outputMargin.value);
+
         // Round margin up to that is always at least the requested size.
         let marginPx = Math.ceil(mmToInches(marginMm) * dpi);
 
-        let canvas = document.createElement('canvas') as HTMLCanvasElement;
-        canvas.width = Math.round(mmToInches(cardSizeMm[0]) * dpi) + 2 * marginPx;
-        canvas.height = Math.round(mmToInches(cardSizeMm[1]) * dpi) + 2 * marginPx;
+        const doc = new jsPDF();
+        let width = 63.5;
+        let height = 88.9;
+        let position = 0;
 
-        activeCards[currentCard].draw(canvas, marginPx);
+        for (let i = 0; i < activeCards.length; i++) {
+            const card = activeCards[i];
+            let canvas = document.createElement('canvas') as HTMLCanvasElement;
+            canvas.width = Math.round(mmToInches(cardSizeMm[0]) * dpi) + 2 * marginPx;
+            canvas.height = Math.round(mmToInches(cardSizeMm[1]) * dpi) + 2 * marginPx;
+            card.draw(canvas, marginPx);
+        
+            if(i % 9 == 0 && Math.floor(i/9) > 0 ){
+                doc.addPage();
+                position = 0;
+            }
+
+            doc.addImage(canvas.toDataURL("image/png"), 'PNG', 3+ position % 3 * width, 3+ Math.floor(position/3) * height, width, height);
+            position++;
+        }
+
 
         let link = document.createElement('a');
-        link.download = 'stratagem.png';
-        link.href = canvas.toDataURL("image/png");
+        link.download = 'stratagem.pdf';
+        link.href = doc.output('dataurlstring');
         link.click();
 
         console.log("Current card: " + currentCard + " Num active cards: " + activeCards.length);
