@@ -103,6 +103,22 @@ function onValueChanged(event: Event) {
     }
 }
 
+function onSourceChanged(event: Event) {
+    const inputElem = event.target as HTMLInputElement;
+    if (inputElem && activeCards[currentCard]) {
+        activeCards[currentCard]._source = inputElem.value;
+        updatePreview();
+    }
+}
+
+function onTimingChanged(event: Event) {
+    const inputElem = event.target as HTMLInputElement;
+    if (inputElem && activeCards[currentCard]) {
+        activeCards[currentCard]._timing = inputElem.value;
+        updatePreview();
+    }
+}
+
 function onPreviousCard() {
     currentCard = Math.max(currentCard - 1, 0);
     updateCardUI();
@@ -195,30 +211,31 @@ function handleFileSelect(event: Event) {
                         else {
                             continue;
                         }
-                        if (cardType == CardType.Prayer) {
-                            if (fields.length == 5) {
-                                let card = new Card();
-                                card._type = cardType;
-                                card._value = "";
-                                card._title = fields[1];
-                                card._heading = fields[2];
-                                card._fluff = fields[3];
-                                card._rule = fields[4];
-                                activeCards.push(card);
-                            }
+
+                        let card = new Card();
+                        if (fields.length < 6) {
+                            //TODO: warning
+                            continue;
                         }
-                        else {
-                            if (fields.length == 6) {
-                                let card = new Card();
-                                card._type = cardType;
-                                card._value = fields[1];
-                                card._title = fields[2];
-                                card._heading = fields[3];
-                                card._fluff = fields[4];
-                                card._rule = fields[5];
-                                activeCards.push(card);
+                        card._type = cardType;
+                        
+                        card._title = fields[1];
+                        card._heading = fields[2];
+                        card._fluff = fields[3];
+                        card._rule = fields[4];
+                        card._source = fields[5];
+                       
+                        if (cardType == CardType.Stratagem || cardType == CardType.PsychicPower) {
+                            //Intentional allows additional fields in the file 
+                            if (fields.length >= 7) {
+                                //TODO: warning
+                                continue;
                             }
+                            card._value = fields[6];   
                         }
+                        
+                        activeCards.push(card);
+                        
                     }
                     currentCard = 0;
                     console.log("Num active cards: " + activeCards.length);
@@ -280,6 +297,14 @@ function updateCardUI() {
         $('#cardtitle').val(activeCards[currentCard]._title);
         $('#cardrule').val(activeCards[currentCard]._rule);
         $('#cardfluff').val(activeCards[currentCard]._fluff);
+        $('#cardsource').val(activeCards[currentCard]._source);
+
+        if (activeCards[currentCard]._type === CardType.SecondaryObjective) {
+            $('#cardtiming').val(activeCards[currentCard]._timing);
+            $('#cardtimingcontrol').show();
+        }else{
+            $('#cardtimingcontrol').hide();
+        }
 
         if (activeCards[currentCard]._type === CardType.Stratagem) {
             $('#cardvalue').attr({"min": 1, "max": 3});
@@ -317,6 +342,8 @@ function plumbCallbacks() {
     $('#cardrule').on('input', onRuleChanged);
     $('#cardfluff').on('input', onFluffChanged);
     $('#cardvalue').on('input', onValueChanged);
+    $('#cardsource').on('input', onSourceChanged);
+    $('#cardtiming').on('input', onTimingChanged);
     $('#createcard').click(handleCreate);
     $('#datacardfile').on('change', handleFileSelect);
 

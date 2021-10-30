@@ -113,6 +113,8 @@ export class Card {
     @JsonProperty() public _fluff: string = "<Fluff text>";
     @JsonProperty() public _rule: string = "<Rule text>"
     @JsonProperty() public _value: string = "1";
+    @JsonProperty() public _source: string = "";
+    @JsonProperty() public _timing: string = "";
 
     private headerFont(): string {
         return Math.round(24*this._scale).toString() + 'px ' + 'Teko';
@@ -131,6 +133,14 @@ export class Card {
     }
     private valueFont(): string {
         return Math.round(24*this._scale).toString() + 'px ' + 'Teko';
+    }
+
+    private sourceFont(): string {
+        return Math.round(10*this._scale).toString() + 'px ' + 'Teko';
+    }
+
+    private timingFont(): string {
+        return Math.round(14*this._scale).toString() + 'px ' + 'serif';
     }
 
     public draw(canvas: HTMLCanvasElement, marginPx: number) {
@@ -200,6 +210,21 @@ export class Card {
 
         curY += borderY;
 
+        if (this._type == CardType.SecondaryObjective && this._timing) {
+            ctx.save();
+            ctx.font = this.timingFont();
+            ctx.fillStyle = 'black';
+            curY = RenderParagraph(ctx, this._timing, marginXLeft, curY, textWidth, Justification.Center);
+            ctx.restore();
+            curY += textRegionHeight / 2;
+
+            // Render separator icon (using line for now)
+            ctx.moveTo(marginXLeft, curY);
+            ctx.lineTo(marginXRight, curY);
+            ctx.stroke();
+            curY += textRegionHeight / 2;
+        }
+        
         if (this._fluff.length > 0) {
             ctx.save();
             ctx.font = this.fluffFont();
@@ -261,6 +286,12 @@ export class Card {
             RenderText(ctx, this._value, marginXLeft * 2, curY - 3, cpBoxSize, cpBoxSize, Justification.Center);
             ctx.restore();
         }
+
+        curY = this._height - borderY * 0.6;
+        ctx.font = this.sourceFont();
+        ctx.fillStyle = 'black';
+        curY = RenderParagraph(ctx, this._source, marginXLeft, curY, textWidth, Justification.Center);
+        ctx.restore();
     }
 
     public toString(): string {
