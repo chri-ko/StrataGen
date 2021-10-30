@@ -19,7 +19,7 @@ import { JsonProperty, Serializable } from 'typescript-json-serializer';
 export enum CardType {
     Stratagem = 'Stratagem',
     PsychicPower = 'Psychic Power',
-    TacticalObjective = 'Tactical Objective',
+    SecondaryObjective = 'Secondary Objective',
     Prayer = 'Prayer'
 }
 
@@ -223,7 +223,7 @@ export class Card {
 
         curY = this._height - borderY * 1.5 - textRegionHeight;
 
-        if ((this._type == CardType.Stratagem) || (this._type == CardType.PsychicPower) || (this._type == CardType.TacticalObjective)) {
+        if ((this._type == CardType.Stratagem) || (this._type == CardType.PsychicPower)) {
 
             const cpBoxSize = textRegionHeight;
             
@@ -244,9 +244,7 @@ export class Card {
             else if (this._type === CardType.PsychicPower) {
                 footText = 'WARP CHARGE';
             }
-            else if (this._type === CardType.TacticalObjective) {
-                footText = 'OBJECTIVE';
-            }
+            
             RenderText(ctx, footText, marginXLeft * 2 + cpBoxSize, curY, textWidth - 2 * marginXLeft - cpBoxSize, textRegionHeight - 6, Justification.Center)
             ctx.restore();
 
@@ -262,9 +260,6 @@ export class Card {
             ctx.fillStyle = '#f5f2f2';
             RenderText(ctx, this._value, marginXLeft * 2, curY - 3, cpBoxSize, cpBoxSize, Justification.Center);
             ctx.restore();
-        }
-        else if (this._type == CardType.Prayer) {
-            // Nothing to do for prayers.
         }
     }
 

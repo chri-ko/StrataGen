@@ -44,8 +44,8 @@ function onCardTypeChanged(event: Event) {
         else if (selectElem.selectedOptions[0].text == 'Psychic Power') {
             activeCards[currentCard]._type = CardType.PsychicPower;
         }
-        else if (selectElem.selectedOptions[0].text == 'Tactical Objective') {
-            activeCards[currentCard]._type = CardType.TacticalObjective;
+        else if (selectElem.selectedOptions[0].text == 'Secondary Objective') {
+            activeCards[currentCard]._type = CardType.SecondaryObjective;
         }
         else if (selectElem.selectedOptions[0].text == 'Prayer') {
             activeCards[currentCard]._type = CardType.Prayer;
@@ -190,7 +190,7 @@ function handleFileSelect(event: Event) {
                         let cardType = CardType.Stratagem;
                         if (fields[0].toUpperCase() == "STRATAGEM") cardType = CardType.Stratagem;
                         else if (fields[0].toUpperCase() === "PSYCHIC POWER") cardType = CardType.PsychicPower;
-                        else if (fields[0].toUpperCase() === "TACTICAL OBJECTIVE") cardType = CardType.TacticalObjective;
+                        else if (fields[0].toUpperCase() === "SECONDARY OBJECTIVE") cardType = CardType.SecondaryObjective;
                         else if (fields[0].toUpperCase() === "PRAYER") cardType = CardType.Prayer;
                         else {
                             continue;
@@ -297,15 +297,7 @@ function updateCardUI() {
             $('#cardvaluelabel').html("Warp Charge");
             $('#cardvaluecontrol').show();
         }
-        else if (activeCards[currentCard]._type === CardType.TacticalObjective) {
-            $('#cardvalue').attr({"min": 11, "max": 66});
-            if (parseInt(activeCards[currentCard]._value) > 66) activeCards[currentCard]._value = "66";
-            else if (parseInt(activeCards[currentCard]._value) < 11) activeCards[currentCard]._value = "11";
-            
-            $('#cardvaluelabel').html("Objective (D66)");            
-            $('#cardvaluecontrol').show();
-        }
-        else if (activeCards[currentCard]._type === CardType.Prayer) {
+        else if (activeCards[currentCard]._type === CardType.Prayer || activeCards[currentCard]._type === CardType.SecondaryObjective) {
             $('#cardvaluecontrol').hide();
         }
 
