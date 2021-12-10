@@ -227,11 +227,18 @@ function handleFileSelect(event: Event) {
                        
                         if (cardType == CardType.Stratagem || cardType == CardType.PsychicPower) {
                             //Intentional allows additional fields in the file 
-                            if (fields.length >= 7) {
+                            if (fields.length < 7) {
                                 //TODO: warning
                                 continue;
                             }
                             card._value = fields[6];   
+                        }else if (cardType == CardType.SecondaryObjective) {
+                            //Intentional allows additional fields in the file 
+                            if (fields.length < 7) {
+                                //TODO: warning
+                                continue;
+                            } 
+                            card._timing = fields[6]
                         }
                         
                         activeCards.push(card);
